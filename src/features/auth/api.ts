@@ -6,16 +6,14 @@ import type {
   VerifyLoginByEmailResponse,
 } from "./types";
 
-export async function loginByEmailAsync(
-  data: LoginByEmailInput,
-): Promise<void> {
-  return await apiClient.post("/authentication/login/email", data);
+export function loginByEmailAsync(data: LoginByEmailInput): Promise<void> {
+  return apiClient.post("/authentication/login/email", data);
 }
 
-export async function verifyLoginByEmailAsync(
+export function verifyLoginByEmailAsync(
   data: VerifyLoginByEmailInput,
 ): Promise<VerifyLoginByEmailResponse> {
-  return await apiClient.post("/authentication/login/email/verify", data);
+  return apiClient.post("/authentication/login/email/verify", data);
 }
 
 let refreshPromise: Promise<RotateRefreshTokenResponse> | null = null;
@@ -28,4 +26,8 @@ export function rotateRefreshTokenAsync(): Promise<RotateRefreshTokenResponse> {
     .finally(() => {
       refreshPromise = null;
     }));
+}
+
+export function logoutAsync(): Promise<void> {
+  return apiClient.post("/authentication/logout");
 }
