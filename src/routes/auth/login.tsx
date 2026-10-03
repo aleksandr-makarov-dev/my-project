@@ -1,3 +1,4 @@
+import { ACCESS_TOKEN_KEY } from "@/common/api/api-client";
 import Button, { buttonVariants } from "@/common/components/button";
 import {
   Fieldset,
@@ -47,7 +48,7 @@ function RouteComponent() {
   function handleVerifyCode(data: VerifyLoginByEmailInput) {
     verifyLoginByEmailMutation.mutate(data, {
       onSuccess: (response) => {
-        console.log(JSON.stringify(response, null, 2));
+        localStorage.setItem(ACCESS_TOKEN_KEY, response.accessToken);
         navigate({ to: "/dashboard" });
       },
       onError: (error) => console.log(JSON.stringify(error, null, 2)),

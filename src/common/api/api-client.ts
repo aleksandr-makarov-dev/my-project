@@ -1,21 +1,62 @@
 import Axios from "axios";
 import { problemDetailsSchema, type ProblemDetails } from "./api-types";
+import { rotateRefreshTokenAsync } from "@/features/auth/api";
 
-export const apiClient = Axios.create({
+export const ACCESS_TOKEN_KEY = "access_token";
+
+const clientConfig = {
   baseURL: import.meta.env.VITE_API_ORIGIN,
   withCredentials: true,
-});
+  headers: {
+    Accept: "application/json",
+  },
+};
+
+export const apiClient = Axios.create(clientConfig);
+export const refreshTokenClient = Axios.create(clientConfig);
+
+refreshTokenClient.interceptors.response.use((response) => response.data);
 
 apiClient.interceptors.request.use((request) => {
-  if (request.headers) {
-    request.headers.Accept = "application/json";
+  const accessToken = localStorage.getItem(ACCESS_TOKEN_KEY);
+
+  if (accessToken) {
+    request.headers.set("Authorization", `Bearer ${accessToken}`);
+  } else {
+    request.headers.delete("Authorization");
   }
+
   return request;
 });
 
 apiClient.interceptors.response.use(
   (response) => response.data,
-  (error) => {
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      try {
+        const { accessToken } = await rotateRefreshTokenAsync();
+
+        localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
+
+        originalRequest.headers.set("Authorization", `Bearer ${accessToken}`);
+
+        return apiClient(originalRequest);
+      } catch (refreshError) {
+        if (
+          Axios.isAxiosError(refreshError) &&
+          refreshError.response?.status === 401
+        ) {
+          localStorage.removeItem(ACCESS_TOKEN_KEY);
+        }
+
+        error = refreshError;
+      }
+    }
+
     if (Axios.isAxiosError(error)) {
       const parseResult = problemDetailsSchema.safeParse(error.response?.data);
 

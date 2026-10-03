@@ -18,3 +18,7 @@ export type VerifyLoginByEmailInput = z.infer<
 export type VerifyLoginByEmailResponse = {
   accessToken: string;
 };
+
+export type RotateRefreshTokenResponse = {
+  accessToken: string;
+};
