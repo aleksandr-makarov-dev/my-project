@@ -2,7 +2,8 @@ import Axios from "axios";
 import { problemDetailsSchema, type ProblemDetails } from "./api-types";
 
 export const apiClient = Axios.create({
-  baseURL: "http://localhost:5264/api/v1",
+  baseURL: import.meta.env.VITE_API_ORIGIN,
+  withCredentials: true,
 });
 
 apiClient.interceptors.request.use((request) => {

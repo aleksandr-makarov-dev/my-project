@@ -3,8 +3,8 @@ import { cva, type VariantProps } from "class-variance-authority";
 import type { ComponentProps } from "react";
 import { cn } from "../lib/cn";
 
-const buttonVariants = cva(
-  "flex h-7 items-center justify-center gap-2 rounded-none border px-3 text-sm leading-none whitespace-nowrap font-normal select-none focus-visible:outline-2 focus-visible:-outline-offset-1 disabled:border-neutral-500 disabled:text-neutral-500 data-disabled:border-neutral-500 data-disabled:text-neutral-500",
+export const buttonVariants = cva(
+  "flex h-7 items-center justify-center gap-2 rounded-none border px-3 text-sm leading-none whitespace-nowrap font-normal select-none focus-visible:outline-2 focus-visible:-outline-offset-1 disabled:opacity-50 data-disabled:opacity-50",
   {
     variants: {
       variant: {
