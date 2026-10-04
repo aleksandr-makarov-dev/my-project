@@ -7,13 +7,17 @@ import type {
 } from "./types";
 
 export function loginByEmailAsync(data: LoginByEmailInput): Promise<void> {
-  return apiClient.post("/authentication/login/email", data);
+  return apiClient.post("/authentication/login/email", data, {
+    skipAuthorization: true,
+  });
 }
 
 export function verifyLoginByEmailAsync(
   data: VerifyLoginByEmailInput,
 ): Promise<VerifyLoginByEmailResponse> {
-  return apiClient.post("/authentication/login/email/verify", data);
+  return apiClient.post("/authentication/login/email/verify", data, {
+    skipAuthorization: true,
+  });
 }
 
 let refreshPromise: Promise<RotateRefreshTokenResponse> | null = null;

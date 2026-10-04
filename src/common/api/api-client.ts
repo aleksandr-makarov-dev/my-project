@@ -2,6 +2,12 @@ import Axios from "axios";
 import { problemDetailsSchema, type ProblemDetails } from "./api-types";
 import { rotateRefreshTokenAsync } from "@/features/auth/api";
 
+declare module "axios" {
+  interface AxiosRequestConfig {
+    skipAuthorization?: boolean;
+  }
+}
+
 export const ACCESS_TOKEN_KEY = "access_token";
 
 const clientConfig = {
@@ -18,6 +24,11 @@ export const refreshTokenClient = Axios.create(clientConfig);
 refreshTokenClient.interceptors.response.use((response) => response.data);
 
 apiClient.interceptors.request.use((request) => {
+  if (request.skipAuthorization) {
+    request.headers.delete("Authorization");
+    return request;
+  }
+
   const accessToken = localStorage.getItem(ACCESS_TOKEN_KEY);
 
   if (accessToken) {
@@ -34,7 +45,12 @@ apiClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (
+      error.response?.status === 401 &&
+      originalRequest &&
+      !originalRequest.skipAuthorization &&
+      !originalRequest._retry
+    ) {
       originalRequest._retry = true;
 
       try {
